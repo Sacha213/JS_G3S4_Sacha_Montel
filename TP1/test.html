@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>TP JS</title>
+
+	<script>
+
+		function countChaine(chaine){
+			return chaine.length;
+		}
+
+		function minTab(tab){
+
+			var min = tab[0];
+
+			for (var i = 1 ; i < tab.length; i++) {
+				if (tab[i]<min) {
+					min = tab[i];
+				}
+			}
+
+			return min;
+		}
+
+		function moyTab(tab){
+			var somme = 0;
+
+			for (var i = 0 ; i < tab.length; i++) {
+				somme += tab[i];
+			}
+
+			return somme/tab.length;
+
+		}
+
+		console.log("hello world");
+
+		console.log(countChaine("hello world"));
+
+		var tab = [1,2,3,-1,-2,-3,10,-2,120];
+
+		console.log(minTab(tab));
+
+		console.log(moyTab(tab));
+
+
+	</script>
+
+</head>
+
+<body>
+</body>
+
+</html>
