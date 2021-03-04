@@ -1,78 +1,160 @@
-
 window.addEventListener("load", init);
 
-function verification(){
-	var valide = true;
+function init() {
 
-	var age = document.getElementById('age').value;
-	var prenom = document.getElementById('prenom').value;
-	var nom = document.getElementById('nom').value;
-	var identifiant = document.getElementById('identifiant').value;
-	var motdepasse1 = document.getElementById('motdepasse1').value;
-	var motdepasse2 = document.getElementById('motdepasse2').value;
-	var cgu = document.getElementById('cgu').checked;
-	var submit = document.getElementById('submit');
+	document.getElementById("add").addEventListener("click", add);
 
-	var regex = new RegExp("^[a-z]{1,12}$");
+	horloge();
+}
 
-	if(age<18) valide=false;
+function horloge() {
+	var hour = document.getElementById("hour");
 
-	if (!regex.test(identifiant)) valide=false;
+	var date = new Date();
+	var h = date.getHours();
+	var m = date.getMinutes()
+	var s = date.getSeconds();
 
-	if(!strongPassword(motdepasse1)) valide=false;
-	if(motdepasse1 !== motdepasse2) valide=false;
+	if (h < 10) h = "0" + h;
+	if (m < 10) m = "0" + m;
+	if (s < 10) s = "0" + s;
 
-	if(!cgu) valide=false;
+	hour.textContent = h + ":" + m + ":" + s;
 
-	if(valide) submit.disabled = false;
-	else submit.disabled = true;
+	setTimeout('horloge()', 1000);
+}
 
-	//console.log(valide);
+function add() {
+	var alarm = document.getElementsByClassName('alarm')[0];
+
+	var div = document.createElement('div');
+	div.id = "div";
+
+	var checkboxInput = document.createElement('input');
+	checkboxInput.id = "checkboxInput";
+	checkboxInput.type = "checkbox";
+	checkboxInput.addEventListener("click", createAlarm);
+
+	var hourInput = document.createElement('input');
+	hourInput.id = "hourInput";
+	hourInput.type = "number";
+	hourInput.min = 0;
+	hourInput.max = 23;
+	hourInput.defaultValue = 0;
+	hourInput.addEventListener("change", createAlarm);
+
+	var txt = document.createElement('p');
+	txt.id = "txt";
+	txt.textContent = ":";
+
+	var minuteInput = document.createElement('input');
+	minuteInput.id = "minuteInput";
+	minuteInput.type = "number";
+	minuteInput.min = 0;
+	minuteInput.max = 59;
+	minuteInput.defaultValue = 0;
+	minuteInput.addEventListener("change", createAlarm);
+
+	var nomInput = document.createElement('input');
+	nomInput.id = "nomInput";
+
+	var musicInput = document.createElement('select');
+	musicInput.id = "musicInput";
+
+	var music1 = document.createElement('option');
+	music1.value = 1;
+	music1.text = "Naruto";
+
+	var music2 = document.createElement('option');
+	music2.value = 2;
+	music2.text = "Code Lyoko";
+
+	var music3 = document.createElement('option');
+	music3.value = 3;
+	music3.text = "One Piece";
+
+	musicInput.add(music1, null);
+	musicInput.add(music2, null);
+	musicInput.add(music3, null);
+
+
+	var deleteInput = document.createElement('button');
+	deleteInput.id = "deleteInput";
+	deleteInput.textContent = "-";
+
+	deleteInput.addEventListener("click", function () {
+		alarm.removeChild(div);
+	});
+
+	div.appendChild(checkboxInput);
+	div.appendChild(hourInput);
+	//div.appendChild(txt);
+	div.appendChild(minuteInput);
+	div.appendChild(nomInput);
+	div.appendChild(musicInput);
+	div.appendChild(deleteInput);
+
+	alarm.appendChild(div);
 
 }
 
-function init(){
-	document.getElementById('age').addEventListener('input', verification);
-	document.getElementById('prenom').addEventListener('input', verification);
-	document.getElementById('nom').addEventListener('input', verification);
-	document.getElementById('identifiant').addEventListener('input', verification);
-	document.getElementById('motdepasse1').addEventListener('input', verification);
-	document.getElementById('motdepasse2').addEventListener('input', verification);
-	document.getElementById('cgu').addEventListener('input', verification);
+function createAlarm() {
 
-	//Help
-	/*
-	document.getElementById('age').addEventListener('mouseover', helpAge);
-	document.getElementById('prenom').addEventListener('mouseover', helpPrenom);
-	document.getElementById('nom').addEventListener('mouseover', helpNom);
-	document.getElementById('identifiant').addEventListener('mouseover', helpIdentifiant);
-	document.getElementById('motdepasse1').addEventListener('mouseover', helpMotDePasse1);
-	document.getElementById('motdepasse2').addEventListener('mouseover', helpMotDePasse2);
-	document.getElementById('cgu').addEventListener('mouseover', helpCgu);
-	*/
+	var hourInput = document.getElementById("hourInput");
+	var minuteInput = document.getElementById("minuteInput");
+
+	var timeMinute = hourInput.value * 60 + minuteInput;
+
+	var date = new Date();
+	var h = date.getHours();
+	var m = date.getMinutes();
+
+	var timeNow = h * 60 + m;
+
+	var timeLeft;
+	if (timeNow - timeMinute > 0) timeLeft = timeNow - timeMinute;
+	else timeLeft = timeNow - timeMinute + 24 * 60;
+
+
+	setTimeout('alarm()', timeLeft * 60000);
 }
 
-function strongPassword(password){
-	var txtPassword = document.getElementsByTagName('label')[4];
-	var strong = 0;
+function alarm() {
 
-	if (password.length>=8) strong+=20;
+	var checkboxInput = document.getElementById("checkboxInput");
 
-	var regex1 = new RegExp("[A-Z]");
-	if (regex1.test(password)) strong+=20;
+	if (checkboxInput.checked == true) {
 
-	var regex2= new RegExp("[a-z]");
-	if (regex2.test(password)) strong+=20;
+		var hourInput = document.getElementById("hourInput").value;
+		var minuteInput = document.getElementById("minuteInput").value;
 
-	var regex3 = new RegExp("[0-9]");
-	if (regex3.test(password)) strong+=20;
+		var date = new Date();
+		var h = date.getHours();
+		var m = date.getMinutes();
 
-	var regex4 = new RegExp("[^a-zA-Z0-9]");
-	if(regex4.test(password)) strong+=20;
+		if (hourInput == h && minuteInput == m) {
+			var audio = document.createElement('audio');
+			audio.id = "audio";
 
-	txtPassword.textContent = "Mot de passe : "+strong+"%";
+			var musicInput = document.getElementById("musicInput");
 
-	return (strong == 100);
+			if (musicInput.value == "1") audio.src = "Naruto.mp3";
+			else if (musicInput.value == 2) audio.src = "CodeLyoko.mp3";
+			else if (musicInput.value == 3) audio.src = "OnePiece.mp3";
+
+			audio.play();
+
+			alert(document.getElementById("nomInput").value);
+			setTimeout('stopMusic()', 10000);
+		}
+	}
+
+
+}
+
+function stopMusic() { 
+	var audio = document.getElementById("audio");
+	audio.pause(); 
 }
 
 

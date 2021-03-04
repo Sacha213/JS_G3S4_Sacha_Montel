@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script>
+        window.addEventListener("load", function () {
+
+            var fieldsArray;
+
+            //Get elements
+            var submitButton = document.getElementById("formInscriptionSubmitButton");
+            var firstname = document.getElementById("formInscriptionFirstname");
+            var name = document.getElementById("formInscriptionName");
+            var tgi = document.getElementById("formInscriptionTGI");
+
+            //Set status
+            firstname.inputOk = false;
+            name.inputOk = false;
+            tgi.inputOk = false;
+            firstname.checkFunction = checkNotEmpty;
+            name.checkFunction = checkNotEmpty;
+            tgi.checkFunction = checkIsChecked;
+
+            //Bind events
+            firstname.addEventListener("keyup", checkInput);
+            name.addEventListener("keyup", checkInput);
+            tgi.addEventListener("click", checkInput);
+
+            fieldsArray = [
+                firstname,
+                name,
+                tgi
+            ];
+
+            //Disable submit
+            setSubmit();
+
+            function setSubmit() {
+                for (let field of fieldsArray) {
+
+                    if (!field.inputOk) {
+                        submitButton.disabled = true;
+                        return;
+                    }
+                }
+
+                submitButton.disabled = false;
+            }
+
+            function checkInput(event) {
+                //Execute la fonction de l'élément cliqué
+                event.target.checkFunction();
+            }
+
+            function checkNotEmpty() {
+                if (this.value.length > 0) {
+                    this.inputOk = true;
+                    this.style.borderColor = "green";
+                } else {
+                    this.inputOk = false;
+                    this.style.borderColor = "red";
+                }
+            }
+
+            function checkIsChecked() {
+                if (this.checked) {
+                    this.inputOk = true;
+                    this.style.borderColor = "green";
+                } else {
+                    this.inputOk = false;
+                    this.style.borderColor = "red";
+                }
+            }
+
+
+
+        })
+
+    </script>
+</head>
+
+<body>
+    <form id="formInscription" action="" method="GET">
+        <input name="formInscriptionFirstname" type="text" id="formInscriptionFirstname">
+
+        <input name="formInscriptionName" type="text" id="formInscriptionName">
+
+        <input name="formInscriptionTGI" type="checkbox" id="formInscriptionTGI">
+
+    </form>
+
+    <button type="submit" form="formInscription" id="formInscriptionSubmitButton">Submit</button>
+
+</body>
+
+</html>
