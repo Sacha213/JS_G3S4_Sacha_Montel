@@ -33,6 +33,7 @@ function add() {
 	var checkboxInput = document.createElement('input');
 	checkboxInput.id = "checkboxInput";
 	checkboxInput.type = "checkbox";
+	checkboxInput.checked = true;
 	checkboxInput.addEventListener("click", createAlarm);
 
 	var hourInput = document.createElement('input');
@@ -121,6 +122,7 @@ function createAlarm() {
 
 function alarm() {
 
+	var alarm = document.getElementsByClassName('alarm')[0];
 	var checkboxInput = document.getElementById("checkboxInput");
 
 	if (checkboxInput.checked == true) {
@@ -135,8 +137,10 @@ function alarm() {
 		if (hourInput == h && minuteInput == m) {
 			var audio = document.createElement('audio');
 			audio.id = "audio";
+			alarm.appendChild(audio);
 
 			var musicInput = document.getElementById("musicInput");
+			
 
 			if (musicInput.value == "1") audio.src = "Naruto.mp3";
 			else if (musicInput.value == 2) audio.src = "CodeLyoko.mp3";
