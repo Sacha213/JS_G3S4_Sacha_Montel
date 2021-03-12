@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>TP JS</title>
+
+    <script>
+        window.addEventListener('load', function () {
+            affichage("json/chapitre1.json");
+        });
+
+        window.addEventListener("hashchange", function () {
+            var possibilites = document.getElementById("possibilites");
+            possibilites.innerHTML = "";
+            affichage("json/chapitre"+window.location.hash.slice(1,window.location.hash.length)+".json");
+        });
+
+        function affichage(url) {
+            var req = new XMLHttpRequest();
+            var myDiv = document.getElementById("myDiv");
+            var possibilites = document.getElementById("possibilites");
+
+
+
+            req.open("GET", url);
+
+            req.onerror = function () {
+                console.log("Échec de chargement " + url);
+            };
+            req.onload = function () {
+                if (req.status === 200) {
+                    var data = JSON.parse(req.responseText);
+                    // do what you have to do with 'data'
+
+                    //On affiche l'explication
+                    myDiv.innerHTML = data.txt;
+
+                    //on propose à l'utilisateur les différentes possibilitées
+                    data.links.forEach(element => {
+                        let possibilite = document.createElement('a');
+                        possibilite.textContent = element.txt;
+                        possibilite.href = element.link;
+
+                        possibilites.appendChild(possibilite);
+
+                        let espace = document.createElement('br');
+                        possibilites.appendChild(espace);
+                    });
+
+                } else {
+                    console.log("Erreur " + req.status);
+                }
+            };
+            req.send();
+        }
+    </script>
+
+</head>
+
+
+
+<body>
+    <div id="myDiv"></div>
+    <p>Possibilitées :</p>
+    <div id="possibilites"></div>
+</body>
+
+</html>
