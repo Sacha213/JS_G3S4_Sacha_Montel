@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>TP Canva</title>
+
+    <style>
+        #canva {
+            border: 1px solid black;
+        }
+    </style>
+
+    <script>
+        window.onload = function () {
+            var canvas = document.getElementById('canva');
+            var context = canvas.getContext('2d');
+            var mouseX;
+            var mouseY;
+            var isDrawing = false;
+
+            context.lineWidth = 10;
+            context.lineJoin = "round";
+
+            canvas.addEventListener('mousedown', function () {
+                mouseX=evt.offsetX;
+                mouseY=evt.offsetY;
+                canvas.addEventListener('mousemove', draw);
+            })
+
+
+            window.addEventListener('mouseup',)
+           
+
+            function draw (evt) {
+                if (isDrawing) {
+                    context.beginPath();
+                    context.moveTo(mouseX, mouseY);
+                    context.lineTo(evt.offsetX, evt.offsetY);
+                    context.closePath();
+                    context.stroke();
+                    mouseX = evt.offsetX;
+                    mouseY = evt.offsetY;
+                }
+
+            }
+
+
+        }
+
+    </script>
+
+</head>
+
+
+
+<body>
+    <canvas id=canva width="800" height="500"></canvas>
+</body>
+
+</html>
