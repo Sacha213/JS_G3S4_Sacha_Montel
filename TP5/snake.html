@@ -17,6 +17,12 @@
             align-items: center;
         }
 
+        #content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
         .snake {
             background-color: #418085;
             width: 35px;
@@ -45,214 +51,249 @@
         #tab {
             width: 595px;
             height: 595px;
-            border: 2px #DF8795 solid;
+            border: 4px #DF8795 solid;
             display: flex;
             flex-wrap: wrap;
         }
     </style>
 
     <script>
-        window.onload = function () {
 
-            //Initialisation
-            var tab = document.getElementById('tab');
-            var score = document.getElementById('score');
+         window.addEventListener('load', function () {
+            affichageLevel();
+        });
 
-            var EMPTY = 0;
-            var FOOD = 2;
-            var SNAKE = 1;
-            var direction = "ArrowUp";
-            var vitesse = 250;
-            var points = 0;
+            
 
-            console.log($_GET('level'));
+            //Choix de la page
+            window.addEventListener("hashchange", function () {
+                var content = document.getElementById('content');
 
-            //Choix de la vitesse en fonction du niveai choisi
-            /*switch ($_GET('level')) {
-                case 1:
-                    var vitesse = 500;
-                    break;
-                case 2:
-                    var vitesse = 250;
-                    break;
-                case 3:
-                    var vitesse = 175;
-                    break;
-                default:
-                    var vitesse = 500;
-                    break;
-            }*/
+                //réinitialisation
+                content.innerHTML = "";
 
-            // La représentation qu'aurait cette grille en Javascript
-            let WORLD = [
-                [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-                [EMPTY, EMPTY, EMPTY, FOOD, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-                [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-                [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-                [EMPTY, SNAKE, SNAKE, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-                [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-                [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-                [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-                [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-                [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-                [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-                [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-                [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-                [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-                [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-                [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-                [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-            ];
-
-            // La représentation qu'aurait le serpent dans la figure ci-dessus.
-            let SNAKETAB = [[4, 1], [4, 2]];
-
-            //Ecouteur sur les touches du claviers pour connaître la direction du snake
-            window.addEventListener('keydown', function (evt) {
-
-                if ((evt.key == "ArrowUp" && direction != "ArrowDown") || (evt.key == "ArrowDown" && direction != "ArrowUp") || (evt.key == "ArrowRight" && direction != "ArrowLeft") || (evt.key == "ArrowLeft" && direction != "ArrowRight")) {
-                    direction = evt.key;
-                }
-
+                if (window.location.hash.slice(1, window.location.hash.length) == 0) affichageLevel();
+                else affichageSnake();
             });
 
-            //Affichage
-            affichage();
+            function affichageLevel(){
+                var content = document.getElementById('content');
 
+                var level1 = document.createElement('a');
+                level1.href="snake.html#1";
+                level1.innerHTML="<button>Niveau 1</button>";
+                content.appendChild(level1);
 
-            //On modifie le snake dans le tableau SNAKETAB
-            function move() {
-                if (direction == "ArrowUp") {
-                    SNAKETAB[SNAKETAB.length] = [SNAKETAB[SNAKETAB.length - 1][0] - 1, SNAKETAB[SNAKETAB.length - 1][1]];
-                }
-                else if (direction == "ArrowDown") {
-                    SNAKETAB[SNAKETAB.length] = [SNAKETAB[SNAKETAB.length - 1][0] + 1, SNAKETAB[SNAKETAB.length - 1][1]];
-                }
-                else if (direction == "ArrowLeft") {
-                    SNAKETAB[SNAKETAB.length] = [SNAKETAB[SNAKETAB.length - 1][0], SNAKETAB[SNAKETAB.length - 1][1] - 1];
-                }
-                else if (direction == "ArrowRight") {
-                    SNAKETAB[SNAKETAB.length] = [SNAKETAB[SNAKETAB.length - 1][0], SNAKETAB[SNAKETAB.length - 1][1] + 1];
-                }
+                var level2 = document.createElement('a');
+                level2.href="snake.html#2";
+                level2.innerHTML="<button>Niveau 2</button>";
+                content.appendChild(level2);
 
-                verification();
-
+                var level3 = document.createElement('a');
+                level3.href="snake.html#3";
+                level3.innerHTML="<button>Niveau 3</button>";
+                content.appendChild(level3);
             }
 
-            function verification() {
+            function affichageSnake(){
 
-                //On regarde quelle est le type de la prochaine case
-                try {
-                    switch (WORLD[SNAKETAB[SNAKETAB.length - 1][0]][SNAKETAB[SNAKETAB.length - 1][1]]) {
-                        case SNAKE:
-                            end();
-                            break;
-                        case FOOD:
-                            points += 10;
-                            addFood();
-                            maj();
-                            break;
-                        case undefined:
-                            end();
-                            break;
-                        default:
-                            maj();
-                            break;
+                //Initialisation
+                var tab = document.createElement('div');
+                tab.id = 'tab';
+                content.appendChild(tab);
+
+                var score = document.createElement('p');
+                score.id = "score";
+                content.appendChild(score);
+
+                var EMPTY = 0;
+                var FOOD = 2;
+                var SNAKE = 1;
+                var direction = "ArrowUp";
+                var vitesse;
+                var points = 0;
+                var level = window.location.hash.slice(1, window.location.hash.length);
+
+
+                //Choix de la vitesse en fonction du niveau choisi
+                if(level ==1) vitesse = 500;
+                else if (level == 2) vitesse = 250;
+                else if (level == 3) vitesse = 175;
+                else vitesse = 500;
+            
+                // La représentation qu'aurait cette grille en Javascript
+                let WORLD = [
+                    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+                    [EMPTY, EMPTY, EMPTY, FOOD, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+                    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+                    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+                    [EMPTY, SNAKE, SNAKE, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+                    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+                    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+                    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+                    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+                    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+                    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+                    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+                    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+                    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+                    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+                    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+                    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+                ];
+
+                // La représentation qu'aurait le serpent dans la figure ci-dessus.
+                let SNAKETAB = [[4, 1], [4, 2]];
+
+                //Ecouteur sur les touches du claviers pour connaître la direction du snake
+                window.addEventListener('keydown', function (evt) {
+
+                    if ((evt.key == "ArrowUp" && direction != "ArrowDown") || (evt.key == "ArrowDown" && direction != "ArrowUp") || (evt.key == "ArrowRight" && direction != "ArrowLeft") || (evt.key == "ArrowLeft" && direction != "ArrowRight")) {
+                        direction = evt.key;
                     }
 
-                }
-                catch (e) {
-                    end();
-                }
+                });
 
-
-            }
-
-            function maj() {
-
-                if (WORLD[SNAKETAB[SNAKETAB.length - 1][0]][SNAKETAB[SNAKETAB.length - 1][1]] != FOOD) {
-                    //On enlève la queu
-                    WORLD[SNAKETAB[0][0]][SNAKETAB[0][1]] = EMPTY;
-                    SNAKETAB = SNAKETAB.slice(1);
-                }
-                //On bouge la tête
-                WORLD[SNAKETAB[SNAKETAB.length - 1][0]][SNAKETAB[SNAKETAB.length - 1][1]] = SNAKE;
-
-
-
-
-                //On met a jour l'affichage
+                //Affichage
                 affichage();
-            }
-
-            function affichage() {
-                //On remove l'affichage précédent
-                tab.innerHTML = "";
-
-                //affichage du score
-                score.textContent = "Score : " + points;
-
-                //affichage des elléments du tableau 
-                for (let i = 0; i < 17; i++) {
-                    for (let j = 0; j < 17; j++) {
-
-                        var cube = document.createElement('div');
-                        tab.appendChild(cube);
 
 
-                        switch (WORLD[i][j]) {
+                //On modifie le snake dans le tableau SNAKETAB
+                function move() {
+                    if (direction == "ArrowUp") {
+                        SNAKETAB[SNAKETAB.length] = [SNAKETAB[SNAKETAB.length - 1][0] - 1, SNAKETAB[SNAKETAB.length - 1][1]];
+                    }
+                    else if (direction == "ArrowDown") {
+                        SNAKETAB[SNAKETAB.length] = [SNAKETAB[SNAKETAB.length - 1][0] + 1, SNAKETAB[SNAKETAB.length - 1][1]];
+                    }
+                    else if (direction == "ArrowLeft") {
+                        SNAKETAB[SNAKETAB.length] = [SNAKETAB[SNAKETAB.length - 1][0], SNAKETAB[SNAKETAB.length - 1][1] - 1];
+                    }
+                    else if (direction == "ArrowRight") {
+                        SNAKETAB[SNAKETAB.length] = [SNAKETAB[SNAKETAB.length - 1][0], SNAKETAB[SNAKETAB.length - 1][1] + 1];
+                    }
+
+                    verification();
+
+                }
+
+                function verification() {
+
+                    //On regarde quelle est le type de la prochaine case
+                    try {
+                        switch (WORLD[SNAKETAB[SNAKETAB.length - 1][0]][SNAKETAB[SNAKETAB.length - 1][1]]) {
                             case SNAKE:
-                                cube.className = "snake";
+                                end();
                                 break;
-
                             case FOOD:
-                                cube.className = "food";
+                                points += 10;
+                                addFood();
+                                maj();
                                 break;
-
+                            case undefined:
+                                end();
+                                break;
                             default:
-                                cube.className = "empty";
+                                maj();
                                 break;
                         }
 
-                        //On modifie la classe de la tête du snake
-                        if (SNAKETAB[SNAKETAB.length - 1][0] == i && SNAKETAB[SNAKETAB.length - 1][1] == j) cube.className = "snakeHead";
-
                     }
+                    catch (e) {
+                        end();
+                    }
+
+
+                }
+
+                function maj() {
+
+                    if (WORLD[SNAKETAB[SNAKETAB.length - 1][0]][SNAKETAB[SNAKETAB.length - 1][1]] != FOOD) {
+                        //On enlève la queu
+                        WORLD[SNAKETAB[0][0]][SNAKETAB[0][1]] = EMPTY;
+                        SNAKETAB = SNAKETAB.slice(1);
+                    }
+                    //On bouge la tête
+                    WORLD[SNAKETAB[SNAKETAB.length - 1][0]][SNAKETAB[SNAKETAB.length - 1][1]] = SNAKE;
+
+
+
+
+                    //On met a jour l'affichage
+                    affichage();
+                }
+
+                function affichage() {
+                    //On remove l'affichage précédent
+                    tab.innerHTML = "";
+
+                    //affichage du score
+                    score.textContent = "Score : " + points;
+
+                    //affichage des elléments du tableau 
+                    for (let i = 0; i < 17; i++) {
+                        for (let j = 0; j < 17; j++) {
+
+                            var cube = document.createElement('div');
+                            tab.appendChild(cube);
+
+
+                            switch (WORLD[i][j]) {
+                                case SNAKE:
+                                    cube.className = "snake";
+                                    break;
+
+                                case FOOD:
+                                    cube.className = "food";
+                                    break;
+
+                                default:
+                                    cube.className = "empty";
+                                    break;
+                            }
+
+                            //On modifie la classe de la tête du snake
+                            if (SNAKETAB[SNAKETAB.length - 1][0] == i && SNAKETAB[SNAKETAB.length - 1][1] == j) cube.className = "snakeHead";
+
+                        }
+                    }
+
+
+
+                    //On refreche l'affichage
+                    setTimeout(() => {
+                        move()
+                    }, vitesse);
+                }
+
+                function end() {
+                    //On affiche un message 
+                    alert("Perdu, votre score est de : " + points);
+                    //On redirige sur la page des niveaux
+                    document.location.href = "snake.html#0";
+                }
+
+
+                function addFood() {
+                    let x = Math.floor(Math.random() * 16);
+                    let y = Math.floor(Math.random() * 16);
+
+                    if (WORLD[x][y] == EMPTY) {
+                        //On ajoute un fruit
+                        WORLD[x][y] = FOOD;
+                    }
+                    else {
+                        addFood();
+                    }
+
                 }
 
 
 
-                //On refreche l'affichage
-                setTimeout(() => {
-                    move()
-                }, vitesse);
-            }
-
-            function end() {
-                //On affiche un message 
-                alert("Perdu, votre score est de : " + points);
-                //On redirige sur la page des niveaux
-            }
-
-
-            function addFood() {
-                let x = Math.floor(Math.random() * 16);
-                let y = Math.floor(Math.random() * 16);
-
-                if (WORLD[x][y] == EMPTY) {
-                    //On ajoute un fruit
-                    WORLD[x][y] = FOOD;
-                }
-                else {
-                    addFood();
-                }
 
             }
+        
 
-
-
-
-        }
 
     </script>
 
@@ -262,8 +303,7 @@
 
 <body>
     <h1>Snake</h1>
-    <div id="tab"></div>
-    <p id="score">Score : </p>
+    <div id="content"></div>
 </body>
 
 </html>
